@@ -1,0 +1,20 @@
+{{ define "loggedout" }}
+    <!DOCTYPE html>
+    <html lang="en">
+    {{ template "header" . }}
+    <body>
+    <div class="navbar">
+        <ul>
+            <li><a href="/">{{ .PageTitle }}</a></li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h1>You have been logged out.</h1>
+        <p>You will be redirected in 3 seconds. <a href="/">Redirect now.</a></p>
+    </div>
+
+    {{ template "footer" . }}
+    </body>
+    </html>
+{{ end }}

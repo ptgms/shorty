@@ -1,0 +1,57 @@
+{{ define "adminadd" }}
+    <!DOCTYPE html>
+    <html lang="en">
+    {{ template "header" .}}
+    <body>
+    {{ template "navbar" .}}
+    <div class="container">
+        <h1>Add Shortlink</h1>
+
+        <form action="/admin/add" method="post" onsubmit="return false;">
+            <label for="shortlink">Shortlink</label>
+            <input type="text" name="shortlink" id="shortlink" placeholder="Shortlink" required>
+            <br>
+            <label for="url">URL</label>
+            <input type="text" name="url" id="url" placeholder="URL" required>
+            <br>
+            <label for="expire">Expires in</label>
+            <input type="date" name="expire" id="expire" placeholder="Expire" value="0">
+            <br>
+            <button type="button" class="addButton" onclick="add()">Add</button>
+        </form>
+    </div>
+    {{ template "footer" . }}
+    <script>
+        function add() {
+            const shortlink = document.getElementById("shortlink").value;
+            const url = document.getElementById("url").value;
+            const expire = document.getElementById("expire").value;
+
+            if (url === "" || shortlink === "") {
+                alert("Please fill in all fields!");
+                return;
+            }
+
+            // check if shortLink only contains letters and numbers
+            if (!/^[a-zA-Z0-9]+$/.test(shortlink)) {
+                alert("Shortlink can only contain letters and numbers!");
+                return;
+            }
+
+            if (expire === "") {
+                window.location.href = "/admin/add/" + btoa(shortlink) + "/" + btoa(url);
+                return;
+            } else {
+                const date = new Date(expire);
+                const now = new Date();
+                if (date < now) {
+                    alert("Expire date must be in the future!");
+                    return;
+                }
+                window.location.href = "/admin/add/" + btoa(shortlink) + "/" + btoa(url) + "?expires=" + expire;
+            }
+        }
+    </script>
+    </body>
+    </html>
+{{ end }}

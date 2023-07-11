@@ -1,0 +1,12 @@
+{{ define "navbar" }}
+<div class="navbar">
+    <ul>
+        <li><a href="/admin">{{ .PageTitle }}</a></li>
+        <li style="float: right;">
+        {{ if .LoginName}}
+            Logged in as {{ .LoginName}} - 
+        {{ end }}
+        <a href="/admin/logout">Logout</a></li>
+    </ul>
+</div>
+{{ end }}

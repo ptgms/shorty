@@ -1,0 +1,135 @@
+{{ define "admin" }}
+<!DOCTYPE html>
+<html lang="en">
+{{ template "header" . }}
+<body>
+{{ template "navbar" . }}
+
+<div class="container">
+    <h1>Welcome, {{ .LoginName }}.</h1>
+    <h2>Manage Shortlinks</h2>
+    <table>
+        <tr>
+            <th><input type="checkbox" id="all" onclick="selectAll()"></th>
+            <th>Shortlink</th>
+            <th>Link</th>
+            <th>Clicks</th>
+            <th>Added On</th>
+            <th>Expires</th>
+            <th>Edit</th>
+            <th>Remove</th>
+        </tr>
+        {{ range .Links }}
+            <tr>
+                <td><input class="selection" type="checkbox" id="{{ .ShortLink }}"></td>
+                <td><a href="{{ .ShortLinkFull }}">{{ .ShortLink }}</a></td>
+                <td>{{ .Link }}</td>
+                <td>{{ .Clicks }}</td>
+                <td>{{ .AddedOn }}</td>
+                <td>{{ .ExpiresAt }}</td>
+                <td><a class="edit">Edit</a></td>
+                <td><a href="#" onclick="deleteShortlink('{{ .ShortLink }}')" class="delete"><svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path fill="currentColor" d="M261-120q-24.75 0-42.375-17.625T201-180v-570h-41v-60h188v-30h264v30h188v60h-41v570q0 24-18 42t-42 18H261Zm438-630H261v570h438v-570ZM367-266h60v-399h-60v399Zm166 0h60v-399h-60v399ZM261-750v570-570Z"/></svg></a></td>
+            </tr>
+        {{ end }}
+    </table>
+
+    <div class="buttons">
+        <button id="addButton"><svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path fill="currentColor" d="M450-200v-250H200v-60h250v-250h60v250h250v60H510v250h-60Z"/></svg> Add Item</button>
+        <button id="removeButton"><svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path fill="currentColor" d="M261-120q-24.75 0-42.375-17.625T201-180v-570h-41v-60h188v-30h264v30h188v60h-41v570q0 24-18 42t-42 18H261Zm438-630H261v570h438v-570ZM367-266h60v-399h-60v399Zm166 0h60v-399h-60v399ZM261-750v570-570Z"/></svg> Remove Selected</button>
+    </div>
+    <script>
+        document.getElementById("addButton").addEventListener("click", function () {
+            window.location.href = "/admin/add";
+        });
+
+        document.getElementById("removeButton").addEventListener("click", function () {
+            deleteSelected();
+        });
+
+        const ids = [
+            {{ range .Links }}
+            "{{ .ShortLink }}",
+            {{ end }}
+        ];
+
+        for (let i = 0; i < ids.length; i++) {
+            document.getElementById(ids[i]).addEventListener("click", function () {
+                select();
+            });
+        }
+
+        function deleteShortlink(shortlink) {
+            console.log(shortlink)
+            // confirm delete
+            if (confirm("Are you sure you want to delete this shortlink?")) {
+                // send delete request
+                window.location.href = "/admin/remove/" + shortlink;
+            }
+        }
+
+        function select() {
+            let i;
+            const all = document.getElementById("all");
+            const checkboxes = document.getElementsByClassName("selection");
+
+            for (i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].type === "checkbox") {
+                    if (!checkboxes[i].checked) {
+                        all.checked = false;
+                        return;
+                    }
+                }
+            }
+            all.checked = true;
+        }
+
+        function selectAll() {
+            console.log("select all")
+            let i;
+            const all = document.getElementById("all");
+            const checkboxes = document.getElementsByClassName("selection");
+
+            if (all.checked) {
+                for (i = 0; i < checkboxes.length; i++) {
+                    if (checkboxes[i].type === "checkbox") {
+                        checkboxes[i].checked = true;
+                    }
+                }
+            } else {
+                for (i = 0; i < checkboxes.length; i++) {
+                    if (checkboxes[i].type === "checkbox") {
+                        checkboxes[i].checked = false;
+                    }
+                }
+            }
+        }
+
+        function deleteSelected() {
+            let i;
+            const checkboxes = document.getElementsByClassName("selection");
+            const shortlinks = [];
+
+            for (i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].type === "checkbox") {
+                    if (checkboxes[i].checked) {
+                        shortlinks.push(checkboxes[i].id);
+                    }
+                }
+            }
+
+            if (shortlinks.length === 0) {
+                alert("No shortlinks selected.");
+                return;
+            }
+
+            if (confirm("Are you sure you want to delete these shortlinks?")) {
+                // send delete request
+                window.location.href = "/admin/remove/" + shortlinks.join(",");
+            }
+        }
+    </script>
+</div>
+{{ template "footer" . }}
+</body>
+</html>
+{{ end }}
