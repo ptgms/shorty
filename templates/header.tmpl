@@ -3,6 +3,7 @@
     <title>Shorty - {{ .PageTitle }}</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20width%3D%221024%22%20height%3D%221024%22%20viewBox%3D%220%200%201024%201024%22%3E%3Cdefs%3E%3Cstyle%3E.a%7Bclip-path%3Aurl(%23c)%3B%7D.b%7Bfill%3Aurl(%23a)%3B%7D%3C%2Fstyle%3E%3CradialGradient%20id%3D%22a%22%20cx%3D%220.482%22%20cy%3D%220.494%22%20r%3D%220.808%22%20gradientTransform%3D%22matrix(-0.606%2C%200.796%2C%20-0.576%2C%20-0.439%2C%201.058%2C%200.327)%22%20gradientUnits%3D%22objectBoundingBox%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23f600ff%22%2F%3E%3Cstop%20offset%3D%220.502%22%20stop-color%3D%22%23e233c5%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%232796cf%22%2F%3E%3C%2FradialGradient%3E%3CclipPath%20id%3D%22c%22%3E%3Crect%20width%3D%221024%22%20height%3D%221024%22%2F%3E%3C%2FclipPath%3E%3C%2Fdefs%3E%3Cg%20id%3D%22b%22%20class%3D%22a%22%3E%3Cpath%20class%3D%22b%22%20d%3D%22M280-280q-83%2C0-141.5-58.5T80-480q0-83%2C58.5-141.5T280-680H420a28.941%2C28.941%2C0%2C0%2C1%2C21.375%2C8.675%2C29.287%2C29.287%2C0%2C0%2C1%2C8.625%2C21.5Q450-637%2C441.375-628.5A29.25%2C29.25%2C0%2C0%2C1%2C420-620H280q-58.333%2C0-99.167%2C40.765t-40.833%2C99Q140-422%2C180.833-381T280-340H420a28.941%2C28.941%2C0%2C0%2C1%2C21.375%2C8.675%2C29.287%2C29.287%2C0%2C0%2C1%2C8.625%2C21.5Q450-297%2C441.375-288.5A29.25%2C29.25%2C0%2C0%2C1%2C420-280Zm75-170a28.941%2C28.941%2C0%2C0%2C1-21.375-8.675%2C29.287%2C29.287%2C0%2C0%2C1-8.625-21.5Q325-493%2C333.625-501.5A29.25%2C29.25%2C0%2C0%2C1%2C355-510H605a28.941%2C28.941%2C0%2C0%2C1%2C21.375%2C8.675%2C29.287%2C29.287%2C0%2C0%2C1%2C8.625%2C21.5Q635-467%2C626.375-458.5A29.25%2C29.25%2C0%2C0%2C1%2C605-450ZM540-280a28.941%2C28.941%2C0%2C0%2C1-21.375-8.675%2C29.287%2C29.287%2C0%2C0%2C1-8.625-21.5Q510-323%2C518.625-331.5A29.25%2C29.25%2C0%2C0%2C1%2C540-340H680q58.333%2C0%2C99.167-40.765t40.833-99Q820-538%2C779.167-579T680-620H540a28.941%2C28.941%2C0%2C0%2C1-21.375-8.675%2C29.287%2C29.287%2C0%2C0%2C1-8.625-21.5Q510-663%2C518.625-671.5A29.25%2C29.25%2C0%2C0%2C1%2C540-680H680q83%2C0%2C141.5%2C58.5T880-480q0%2C83-58.5%2C141.5T680-280Z%22%20transform%3D%22translate(-166.822%20512)%20rotate(45)%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E'>
     <style>
         /* CSS styles for the admin interface */
         body {
@@ -43,7 +44,12 @@
         .navbar ul li a {
             color: #fff;
             text-decoration: none;
-            padding: 5px 10px;
+        }
+
+        .navbar ul li svg {
+            height: 20px;
+            width: 20px;
+            margin-right: 5px;
         }
 
         .container {

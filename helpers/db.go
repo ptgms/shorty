@@ -53,8 +53,8 @@ func GetLink(db *sql.DB, shortCode string) string {
 	return url
 }
 
-func RemoveLink(db *sql.DB, shortCode string) {
-	_, err := db.Exec("DELETE FROM shorty_links WHERE short_code = $1", shortCode)
+func RemoveLink(db *sql.DB, id string) {
+	_, err := db.Exec("DELETE FROM shorty_links WHERE id = $1", id)
 	if err != nil {
 		println("Error while trying to delete data!")
 		println(err.Error())
@@ -63,7 +63,7 @@ func RemoveLink(db *sql.DB, shortCode string) {
 
 func GetLinks(db *sql.DB, path string) []PageTable {
 	var links []PageTable
-	rows, err := db.Query("SELECT short_code, url, clicks, created_at, expires_at FROM shorty_links ORDER BY clicks DESC")
+	rows, err := db.Query("SELECT id, short_code, url, clicks, created_at, expires_at FROM shorty_links ORDER BY clicks DESC")
 	if err != nil {
 		println("Error while trying to get data!")
 		println(err.Error())
@@ -71,7 +71,7 @@ func GetLinks(db *sql.DB, path string) []PageTable {
 	defer rows.Close()
 	for rows.Next() {
 		var link PageTable
-		err := rows.Scan(&link.ShortLink, &link.Link, &link.Clicks, &link.AddedOn, &link.ExpiresAt)
+		err := rows.Scan(&link.ID, &link.ShortLink, &link.Link, &link.Clicks, &link.AddedOn, &link.ExpiresAt)
 		if err != nil {
 			println("Error while trying to get data!")
 			println(err.Error())

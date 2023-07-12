@@ -43,6 +43,7 @@ type Configuration struct {
 }
 
 type PageTable struct {
+	ID            int
 	ShortLink     string
 	ShortLinkFull string
 	Link          string
