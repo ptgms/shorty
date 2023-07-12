@@ -419,7 +419,6 @@ func shortenLink(w http.ResponseWriter, r *http.Request) {
 
 	// check if we have the url in cache
 	if data := getFromCache(key); data != nil {
-		fmt.Println("Found in cache")
 		// redirect to the link
 		http.Redirect(w, r, string(data), http.StatusMovedPermanently)
 		return
