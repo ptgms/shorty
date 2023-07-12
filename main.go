@@ -369,7 +369,6 @@ func adminPageAddShort(w http.ResponseWriter, r *http.Request) {
 	short := vars["short"]
 	long := strings.Replace(vars["long"], ".", "/", -1)
 	expires := r.URL.Query().Get("expires")
-	fmt.Println("Endpoint Hit: adminPageAddShort " + short + " " + long + " " + expires)
 
 	long = helpers.Base64Decode(long)
 	short = helpers.Base64Decode(short)
@@ -381,7 +380,6 @@ func adminPageAddShort(w http.ResponseWriter, r *http.Request) {
 func adminPage(w http.ResponseWriter, r *http.Request) {
 	// get current timestamp
 	t := time.Now()
-	fmt.Println("Endpoint Hit: adminPage")
 	//  get user from session
 	session, _ := store.Get(r, "session-name")
 	username := session.Values["username"]
@@ -402,7 +400,6 @@ func adminPageAdd(w http.ResponseWriter, r *http.Request) {
 	//  get user from session
 	session, _ := store.Get(r, "session-name")
 	username := session.Values["username"]
-	fmt.Println("Endpoint Hit: adminPageAdd")
 	data := helpers.PageData{
 		PageTitle: "Shorty Admin",
 		LoginName: username.(string),
@@ -419,7 +416,6 @@ func shortenLink(w http.ResponseWriter, r *http.Request) {
 	if key == "" || key == "admin" || key == "favicon.ico" {
 		return
 	}
-	fmt.Println("Endpoint Hit: shortenLink " + key)
 
 	// check if we have the url in cache
 	if data := getFromCache(key); data != nil {
