@@ -3,9 +3,23 @@ package helpers
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
+
+	_ "github.com/lib/pq"
 )
+
+func CreateConnection(config Configuration) *sql.DB {
+	psqlconn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		config.Database.Host, config.Database.Port, config.Database.User, config.Database.Password, config.Database.Database)
+	db, err := sql.Open("postgres", psqlconn)
+	HandleError(err, true)
+	err = db.Ping()
+	HandleError(err, true)
+	CreateDBIfNotExists(db)
+	return db
+}
 
 func CreateDBIfNotExists(db *sql.DB) {
 	_, err := db.Exec("CREATE TABLE IF NOT EXISTS shorty_links (id SERIAL PRIMARY KEY, url TEXT NOT NULL, short_code TEXT NOT NULL UNIQUE, clicks INT NOT NULL DEFAULT 0, created_at TIMESTAMP NOT NULL DEFAULT NOW(), expires_at TEXT);")
@@ -68,7 +82,12 @@ func GetLinks(db *sql.DB, path string) []PageTable {
 		println("Error while trying to get data!")
 		println(err.Error())
 	}
-	defer rows.Close()
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+			HandleError(err, false)
+		}
+	}(rows)
 	for rows.Next() {
 		var link PageTable
 		err := rows.Scan(&link.ID, &link.ShortLink, &link.Link, &link.Clicks, &link.AddedOn, &link.ExpiresAt)

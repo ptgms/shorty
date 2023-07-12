@@ -5,14 +5,12 @@ import (
 	"context"
 	"crypto/tls"
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
 	"net/http"
 	"os"
 	"shortlink/helpers"
-	"strconv"
 	"strings"
 	"time"
 
@@ -24,8 +22,6 @@ import (
 	"github.com/go-co-op/gocron"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-
-	_ "github.com/lib/pq"
 )
 
 var (
@@ -146,7 +142,8 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 
 func notFoundHandler(w http.ResponseWriter, r *http.Request) {
 	//	print url to writer
-	fmt.Fprintf(w, "404 - Not Found - %s", r.URL.Path)
+	_, err := fmt.Fprintf(w, "404 - Not Found - %s", r.URL.Path)
+	helpers.HandleError(err, false)
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
@@ -194,7 +191,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if token is valid
-	valid, authUser := isTokenValid(token, config)
+	valid, authUser := helpers.IsTokenValid(token, config, oauthConfig)
 	if !valid {
 		http.Error(w, "Invalid token", http.StatusUnauthorized)
 		return
@@ -224,101 +221,6 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &cookie)
 
 	http.Redirect(w, r, "/admin", http.StatusSeeOther)
-}
-
-func isTokenValid(token *oauth2.Token, config helpers.Configuration) (bool, helpers.AuthUser) {
-	client := oauthConfig.Client(context.Background(), token)
-	switch config.OAuth.Type {
-	case "discord":
-		return isDiscordTokenValid(client)
-	case "google":
-		return isGoogleTokenValid(client)
-	case "github":
-		return isGithubTokenValid(client)
-	default:
-		return false, helpers.AuthUser{}
-	}
-}
-
-func isGithubTokenValid(client *http.Client) (bool, helpers.AuthUser) {
-	resp, err := client.Get("https://api.github.com/user")
-	if err != nil {
-		return false, helpers.AuthUser{}
-	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			return
-		}
-	}(resp.Body)
-
-	var result map[string]interface{}
-
-	err = json.NewDecoder(resp.Body).Decode(&result)
-	if err != nil {
-		return false, helpers.AuthUser{}
-	}
-
-	authUser := helpers.AuthUser{
-		Username: result["login"].(string),
-		ID:       strconv.FormatFloat(result["id"].(float64), 'f', 0, 64),
-	}
-
-	return resp.StatusCode == http.StatusOK, authUser
-}
-
-func isDiscordTokenValid(client *http.Client) (bool, helpers.AuthUser) {
-	resp, err := client.Get("https://discord.com/api/users/@me")
-	if err != nil {
-		return false, helpers.AuthUser{}
-	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			return
-		}
-	}(resp.Body)
-
-	var result map[string]interface{}
-
-	err = json.NewDecoder(resp.Body).Decode(&result)
-	if err != nil {
-		return false, helpers.AuthUser{}
-	}
-
-	authUser := helpers.AuthUser{
-		Username: result["username"].(string),
-		ID:       result["id"].(string),
-	}
-
-	return resp.StatusCode == http.StatusOK, authUser
-}
-
-func isGoogleTokenValid(client *http.Client) (bool, helpers.AuthUser) {
-	resp, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
-	if err != nil {
-		return false, helpers.AuthUser{}
-	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			return
-		}
-	}(resp.Body)
-
-	var result map[string]interface{}
-
-	err = json.NewDecoder(resp.Body).Decode(&result)
-	if err != nil {
-		return false, helpers.AuthUser{}
-	}
-
-	authUser := helpers.AuthUser{
-		Username: result["name"].(string),
-		ID:       result["id"].(string),
-	}
-
-	return resp.StatusCode == http.StatusOK, authUser
 }
 
 func homePage(w http.ResponseWriter, _ *http.Request) {
@@ -461,20 +363,6 @@ func prepareScheduler() {
 	s.StartAsync()
 }
 
-func createConnection(config helpers.Configuration) *sql.DB {
-	psqlconn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		config.Database.Host, config.Database.Port, config.Database.User, config.Database.Password, config.Database.Database)
-	db, err := sql.Open("postgres", psqlconn)
-	helpers.HandleError(err, true)
-
-	err = db.Ping()
-	helpers.HandleError(err, true)
-
-	helpers.CreateDBIfNotExists(db)
-
-	return db
-}
-
 var config helpers.Configuration
 
 func main() {
@@ -492,7 +380,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	db = createConnection(config)
+	db = helpers.CreateConnection(config)
 	initOauth(config)
 	prepareScheduler()
 	handleRequests(config)
