@@ -39,8 +39,7 @@
             }
 
             if (expire === "") {
-                window.location.href = "/admin/add/" + btoa(shortlink) + "/" + btoa(url);
-                return;
+                window.location.href = "/admin/add/" + encodeURIComponent(btoa(shortlink)) + "/" + btoa(url).replace("/", ".");
             } else {
                 const date = new Date(expire);
                 const now = new Date();
@@ -48,7 +47,7 @@
                     alert("Expire date must be in the future!");
                     return;
                 }
-                window.location.href = "/admin/add/" + btoa(shortlink) + "/" + btoa(url) + "?expires=" + expire;
+                window.location.href = "/admin/add/" + btoa(shortlink) + "/" + btoa(url).replace("/", ".") + "?expires=" + expire;
             }
         }
     </script>

@@ -102,6 +102,8 @@ func handleRequests(config helpers.Configuration) {
 	router.PathPrefix("/admin/main.css").Handler(http.StripPrefix("/admin/", http.FileServer(http.Dir("admin/"))))
 	router.HandleFunc("/{id}", shortenLink)
 
+	router.NotFoundHandler = http.HandlerFunc(notFoundHandler)
+
 	server := http.Server{
 		Addr:    ":8081",
 		Handler: router,
@@ -140,6 +142,11 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 
 		next(w, r)
 	}
+}
+
+func notFoundHandler(w http.ResponseWriter, r *http.Request) {
+	//	print url to writer
+	fmt.Fprintf(w, "404 - Not Found - %s", r.URL.Path)
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
@@ -360,7 +367,7 @@ func adminPageRemove(w http.ResponseWriter, r *http.Request) {
 func adminPageAddShort(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	short := vars["short"]
-	long := vars["long"]
+	long := strings.Replace(vars["long"], ".", "/", -1)
 	expires := r.URL.Query().Get("expires")
 	fmt.Println("Endpoint Hit: adminPageAddShort " + short + " " + long + " " + expires)
 
